@@ -1,3 +1,8 @@
+/* Filename: Lab 2 Task i.cpp
+Author: Brandon Mills Jacinto
+Date: 13/02/2025
+*/
+
 #include "mbed.h"
  
 #define NUMBER_OF_AVG_SAMPLES 100
