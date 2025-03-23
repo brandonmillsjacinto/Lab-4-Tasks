@@ -1,0 +1,46 @@
+#include "mbed.h"
+ 
+#define NUMBER_OF_AVG_SAMPLES 100
+#define TIME_INCREMENT_MS 1000
+
+AnalogIn lm35(A1);
+UnbufferedSerial uartUSB(USBTX, USBRX, 115200);
+
+float lm35ReadingsAverage = 0.0;
+float lm35ReadingsSum = 0.0;
+float lmReadingsArray[NUMBER_OF_AVG_SAMPLES];
+float lm35TempC = 0.0;
+
+float analogReadingForLM35Formula(float analogReading);
+
+int main ()
+{
+    while(true) {
+        static int lm35SampleIndex = 0;
+        lmReadingsArray[lm35SampleIndex] = lm35.read();
+        lm35SampleIndex++;
+        if (lm35SampleIndex >= NUMBER_OF_AVG_SAMPLES) {
+            lm35SampleIndex = 0;
+        }
+
+      lm35ReadingsSum = 0.0;
+      for (int i = 0; i < NUMBER_OF_AVG_SAMPLES; i++) {
+          lm35ReadingsSum += lmReadingsArray[i];
+      }
+
+      lm35ReadingsAverage = lm35ReadingsSum  / NUMBER_OF_AVG_SAMPLES;
+
+      lm35TempC = analogReadingForLM35Formula(lm35ReadingsAverage);
+
+      char str[100];
+      int stringLength = sprintf(str, "Temperature: %.2f °C", lm35TempC);
+      uartUSB.write(str, stringLength);
+
+      ThisThread::sleep_for(TIME_INCREMENT_MS); 
+    }
+}
+
+float analogReadingForLM35Formula(float analogReading)
+{
+    return (analogReading * 3.3 / 0.01);
+}
