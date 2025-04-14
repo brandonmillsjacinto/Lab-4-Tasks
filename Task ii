@@ -1,0 +1,23 @@
+/* Filename: Lab 4 Task i.cpp
+Author: Brandon Mills Jacinto
+Date: 13/02/2025
+*/
+
+#include "mbed.h" // I used the Mbed Library for Hardware control.
+
+AnalogIn potentiometer(A0); // Analog input pin for potentiometer
+UnbufferedSerial uartUSB(USBTX, USBRX, 115200); // Serial communication for USB at 115200 baud rate
+
+int main()
+{
+    uartUSB.write("Potentiometer Reading:\r\n", 23); // Prints 'Potentiometer Reading:' in the serial terminal
+    while (true) { // Infinite loop to continuously read and send potentiometer values
+        float potentiometerReading = potentiometer.read(); // Read the analog value from the potentiometer. The result is a float between 0.0 and 1.0.
+        
+        char message[50]; // Declares a character array 'message' to store the formatted string. Size 50 is chosen to accommodate the message.
+        sprintf(message, "Potentiometer Reading: %.2f\r\n", potentiometerReading); // Format the potentiometer reading into a string. The '%.2f' formats the float to 2 decimal places.
+        uartUSB.write(message, strlen(message)); // Sends the formatted string to the serial terminal. The strlen(message) calculates the length of the string to be sent.
+        
+        ThisThread::sleep_for(1000ms); // Wait for 1s (1000ms)
+    }
+}
