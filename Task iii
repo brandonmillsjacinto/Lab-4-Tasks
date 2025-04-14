@@ -1,0 +1,30 @@
+/* Filename: Lab 4 Task i.cpp
+Author: Brandon Mills Jacinto
+Date: 13/02/2025
+*/
+
+#include "mbed.h" // I used the Mbed Library for Hardware control.
+
+AnalogIn GasSensor(A2); // Analog input pin for Gas sensor
+UnbufferedSerial uartUsb(USBTX, USBRX, 115200); // Serial communication for USB at 115200 baud rate
+float GasSensorReading; // Declare a float variable to store the gas sensor reading.
+
+int main()
+{
+    while( true ) { // Infinite loop to continuously read and send gas sensor values
+        char str[10] = ""; // Declares a character array 'str' to store the formatted string. 
+        GasSensorReading = GasSensor.read()*3.3; // Reads the analog value from the gas sensor and times it by 3.3 (Voltage)
+        str[0] = '\0'; // This line resets the string
+        
+        sprintf (str,"Gas reading: %.2f\r\n", GasSensorReading); // Formats the gas sensor reading into a string.
+        uartUsb.write( str, strlen(str) ); // Sends the formatted string to the serial terminal.
+        
+        if (GasSensorReading > 0.8) { // If the Gas sensor reading is more than 0.8
+        uartUsb.write("Gas is detected\r\n", 17); // Printed in the serial terminal
+            } else { // Else if it less than 0.8
+                
+         uartUsb.write("Gas is not detected\r\n", 21); // Printed in the serial terminal
+                }
+         ThisThread::sleep_for(1000); // Wait for 1s (1000ms)
+                }
+}
