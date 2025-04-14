@@ -1,0 +1,43 @@
+/* Filename: Lab 4 Task i.cpp
+Author: Brandon Mills Jacinto
+Date: 13/02/2025
+*/
+
+#include "mbed.h" // I used the Mbed Library for Hardware control.
+
+AnalogIn TempSensor(A1); // Analog input pin for Temp sensor
+AnalogIn GasSensor(A2); // Analog input pin for Gas sensor
+UnbufferedSerial uartUsb(USBTX, USBRX, 115200); // Serial communication for USB at 115200 baud rate
+
+float TemperatureReading; // Declare a float variable to store the Temp sensor reading.
+float GasSensorReading; // Declare a float variable to store the gas sensor reading.
+
+int main() {
+    while( true ) { // Infinite loop to continuously read and send gas sensor and temp sensor values
+        uartUsb.write( "------------------------------\r\n", 32); // Prints a separator line
+        char str[30]; // Character array to store formatted strings
+
+TemperatureReading = TempSensor.read()*330; // Reads the temperature sensor readings
+sprintf ( str, "Temperature reading: %.2f\r\n", TemperatureReading); // Formats temperature reading into a string
+uartUsb.write( str, strlen(str) ); // Sends temperature reading to the serial terminal
+
+GasSensorReading = GasSensor.read()*3.3; // Reads the Gas sensor readings
+sprintf ( str, "Gas reading: %.2f\r\n", GasSensorReading); // Formats the gas reading into a string
+uartUsb.write( str, strlen(str) ); // Sends gas reading to the serial terminal
+
+if (TemperatureReading > 24 || GasSensorReading < 0.8) { // If Temp Reading is more than 24 or Gas Sensor is less than 0.8
+if (TemperatureReading > 24) { // If Temp is more than 24...
+    uartUsb.write( "Temperature Alarm!\r\n", 21); // ...This is printed in serial terminal
+}
+if (GasSensorReading > 0.8) { // If gas is more than 0.8...
+    uartUsb.write( "Gas Alarm!\r\n", 13); // ... This is printed in serial terminal
+}
+if (GasSensorReading < 0.8 && TemperatureReading < 24); // If Gas is less than 0.8 and Temp is less than 24...
+    uartUsb.write( "No active alarms!\r\n", 18); // ... This is printed in serial terminal
+} else { // Else if Gas is more than 0.8 and Temp is more than 24...
+uartUsb.write( "Alarm Active!\r\n", 14); // ... This is printed in serial terminal
+}
+
+ThisThread::sleep_for(chrono::milliseconds(1000)); // Wait for 1s (1000ms)
+}
+}
